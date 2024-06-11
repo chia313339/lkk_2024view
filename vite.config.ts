@@ -18,4 +18,7 @@ export default defineConfig({
     optimizeDeps: {
         include: ['quill'],
     },
+    server: {
+        port: 8888,  // 指定開發伺服器的端口
+    }
 });
