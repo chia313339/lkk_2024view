@@ -23,27 +23,6 @@
             <button type="submit" class="btn btn-primary mt-6">查詢會員</button>
           </form>
         </div>
-        <!-- <div class="panel">
-          <h2>顯示查詢結果</h2>
-          <div v-if="userProfile && userProfile.length > 0">
-            {{ userProfile }}
-            <p><strong>名字:</strong> {{ userProfile[0].name }}</p>
-            <p><strong>職業:</strong> {{ userProfile[0].job }}</p>
-            <p>
-              <strong>生日:</strong> {{ formatDate(userProfile[0].birthday) }}
-            </p>
-            <p>
-              <strong>性別:</strong> {{ formatGender(userProfile[0].gender) }}
-            </p>
-            <p><strong>電話:</strong> {{ userProfile[0].phone }}</p>
-            <p><strong>腰圍:</strong> {{ userProfile[0].waist }}</p>
-            <p><strong>體重:</strong> {{ userProfile[0].weight }}</p>
-          </div>
-          <div v-else>
-            <p>沒有找到會員資料</p>
-          </div>
-          <div v-if="error">{{ error }}</div>
-        </div> -->
       </div>
     </div>
     <div v-if="userProfile && userProfile.length > 0" class="pt-5">
@@ -193,13 +172,13 @@
           </apexchart>
         </div>
       </div>
-          <!-- 身體數值趨勢 -->
+      <!-- 身體數值趨勢 -->
       <div class="panel h-full p-0">
         <div class="flex p-5">
           <div
             class="shrink-0 bg-primary/10 text-primary rounded-xl w-11 h-11 flex justify-center items-center dark:bg-primary dark:text-white-light"
           >
-          <i class="fa-solid fa-weight-scale"></i>
+            <i class="fa-solid fa-weight-scale"></i>
           </div>
           <div class="ltr:ml-3 rtl:mr-3 font-semibold">
             <p class="text-xl dark:text-white-light">骨骼肌重(kg)</p>
@@ -230,7 +209,7 @@
           <div
             class="shrink-0 bg-danger/10 text-danger rounded-xl w-11 h-11 flex justify-center items-center dark:bg-danger dark:text-white-light"
           >
-          <i class="fa-solid fa-burger"></i>
+            <i class="fa-solid fa-burger"></i>
           </div>
           <div class="ltr:ml-3 rtl:mr-3 font-semibold">
             <p class="text-xl dark:text-white-light">體脂肪率(%)</p>
@@ -255,16 +234,14 @@
           </apexchart>
         </div>
       </div>
-
     </div>
-
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useAppStore } from "@/stores/index";
 import { useMeta } from "@/composables/use-meta";
-import { ref, computed, onMounted, watch } from "vue";
+import { Ref, ref, computed, onMounted, watch } from "vue";
 import axios from "axios";
 
 import IconCoffee from "@/components/icon/icon-coffee.vue";
@@ -304,7 +281,7 @@ const fetchUserProfile = async () => {
       );
       userInbody.value = inbodyResponse.data;
       updateCharts();
-    } catch (inbodyError) {
+    } catch (inbodyError: any) {
       if (inbodyError.response && inbodyError.response.status === 404) {
         console.error("Inbody data not found:", inbodyError);
         userInbody.value = []; // Clear inbody data on 404 error
@@ -326,21 +303,33 @@ const fetchUserProfile = async () => {
   }
 };
 
+const skeletalMuscleMassSeries: Ref<{ data: number[] }[]> = ref([
+  {
+    data: [],
+  },
+]);
+
+const percentbodyfatSeries: Ref<{ data: number[] }[]> = ref([
+  {
+    data: [],
+  },
+]);
+
 const updateCharts = () => {
   if (userInbody.value.length === 0) {
     clearCharts();
     return;
   }
 
-  const smmData = [];
-  const pbfData = [];
+  const smmData: number[] = [];
+  const pbfData: number[] = [];
 
   userInbody.value.forEach((entry) => {
     if (entry["SMM (Skeletal Muscle Mass)"]) {
-      smmData.push(parseFloat(entry["SMM (Skeletal Muscle Mass)"]));
+      smmData.push(parseFloat(entry["SMM (Skeletal Muscle Mass)"] as string));
     }
     if (entry["PBF (Percent Body Fat)"]) {
-      pbfData.push(parseFloat(entry["PBF (Percent Body Fat)"]));
+      pbfData.push(parseFloat(entry["PBF (Percent Body Fat)"] as string));
     }
   });
 
@@ -579,12 +568,6 @@ const skeletalMuscleMass = computed(() => {
   };
 });
 
-const skeletalMuscleMassSeries = ref([
-  {
-    data: [],
-  },
-]);
-
 // percentbodyfat
 const percentbodyfat = computed(() => {
   return {
@@ -623,10 +606,4 @@ const percentbodyfat = computed(() => {
     },
   };
 });
-
-const percentbodyfatSeries = ref([
-  {
-    data: [],
-  },
-]);
 </script>
