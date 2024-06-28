@@ -38,7 +38,6 @@
 </template>
 <script setup lang="ts">
     import { ref } from 'vue';
-    import Vue3Datatable from '@bhplugin/vue3-datatable';
     import { useMeta } from '@/composables/use-meta';
 
     import IconBell from '@/components/icon/icon-bell.vue';
