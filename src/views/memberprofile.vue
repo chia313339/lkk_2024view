@@ -264,12 +264,12 @@ const error = ref<string | null>(null);
 const fetchUserProfile = async () => {
   try {
     const profileResponse = await axios.get(
-      `http://34.122.239.34:8003/userprofile?phone=${phoneNumber.value}`
+      `https://api.l-kk.tw//userprofile?phone=${phoneNumber.value}`
     );
     userProfile.value = profileResponse.data;
 
     const historyResponse = await axios.get(
-      `http://34.122.239.34:8003/userhist?phone=${phoneNumber.value}`
+      `https://api.l-kk.tw/userhist?phone=${phoneNumber.value}`
     );
     userHistory.value = historyResponse.data.sort(
       (a, b) => new Date(b.input_dt).getTime() - new Date(a.input_dt).getTime()
@@ -277,7 +277,7 @@ const fetchUserProfile = async () => {
 
     try {
       const inbodyResponse = await axios.get(
-        `http://34.122.239.34:8003/userinbody?phone=${phoneNumber.value}`
+        `https://api.l-kk.tw/userinbody?phone=${phoneNumber.value}`
       );
       userInbody.value = inbodyResponse.data;
       updateCharts();
