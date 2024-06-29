@@ -127,12 +127,20 @@
                       data.value.source === 'quest_biweekly'
                     "
                     class="badge badge-outline-success rounded-full"
-                    >問卷資料</span
+                    ><a
+                      href="javascript:void(0)"
+                      @click="fetchModalData(data.value.sid)"
+                      >問卷資料</a
+                    ></span
                   >
                   <span
                     v-else-if="data.value.source === 'inbody'"
                     class="badge badge-outline-info rounded-full"
-                    >InBody</span
+                    ><a
+                      href="javascript:void(0)"
+                      @click="fetchModalData(data.value.sid)"
+                      >InBody</a
+                    ></span
                   >
                   <span
                     v-else-if="
@@ -140,7 +148,11 @@
                       data.value.source === 'bodygo_full'
                     "
                     class="badge badge-outline-warning rounded-full"
-                    >BodyGo</span
+                    ><a
+                      href="javascript:void(0)"
+                      @click="fetchModalData(data.value.sid)"
+                      >BodyGo</a
+                    ></span
                   >
                   <span v-else>{{ data.value.source }}</span>
                 </template>
@@ -150,20 +162,95 @@
         </div>
       </div>
     </div>
-    <!-- 資料源分佈 -->
+
+    <!-- Modal -->
+    <TransitionRoot appear :show="modal_data" as="template">
+      <Dialog as="div" @close="modal_data = false" class="relative z-[51]">
+        <TransitionChild
+          as="template"
+          enter="duration-300 ease-out"
+          enter-from="opacity-0"
+          enter-to="opacity-100"
+          leave="duration-200 ease-in"
+          leave-from="opacity-100"
+          leave-to="opacity-0"
+        >
+          <DialogOverlay class="fixed inset-0 bg-[black]/60" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 overflow-y-auto">
+          <div class="flex min-h-full items-start justify-center px-4 py-8">
+            <TransitionChild
+              as="template"
+              enter="duration-300 ease-out"
+              enter-from="opacity-0 scale-95"
+              enter-to="opacity-100 scale-100"
+              leave="duration-200 ease-in"
+              leave-from="opacity-100 scale-100"
+              leave-to="opacity-0 scale-95"
+            >
+              <DialogPanel
+                class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-5xl text-black dark:text-white-dark"
+              >
+                <button
+                  type="button"
+                  class="absolute top-4 ltr:right-4 rtl:left-4 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 outline-none"
+                  @click="modal_data = false"
+                >
+                  <icon-x />
+                </button>
+                <div
+                  class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]"
+                >
+                  資料內容
+                </div>
+                <div class="p-5">
+                  <table class="min-w-full bg-white table-hover">
+                    <thead>
+                      <tr>
+                        <th class="py-2 px-4 border-b">項目</th>
+                        <th class="py-2 px-4 border-b">內容值</th>
+                      </tr>
+                    </thead>
+                    <tbody v-if="modalContent && modalContent.length > 0">
+                      <tr v-for="(value, key) in modalContent[0]" :key="key">
+                        <td class="py-2 px-4 border-b">{{ key }}</td>
+                        <td class="py-2 px-4 border-b">{{ value }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
+
+      <!-- 身體數值趨勢 -->
     <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-      <div class="panel h-full ">
-        <h5 class="font-semibold text-lg dark:text-white-light">資料源分佈</h5>
-        <div>
+      <div class="panel h-full p-0 sm:col-span-2 xl:col-span-1">
+        <div class="flex p-5">
+          <div
+            class="shrink-0 bg-success/10 text-success rounded-xl w-11 h-11 flex justify-center items-center dark:bg-success dark:text-white-light"
+          >
+          <i class="fa-solid fa-child-reaching"></i>
+          </div>
+          <div class="ltr:ml-3 rtl:mr-3 font-semibold">
+            <p class="text-xl dark:text-white-light">BMI</p>
+            <h5 class="text-[#506690] text-xs">根據可取得數據</h5>
+          </div>
+        </div>
+        <div class="h-40">
           <apexchart
-            height="460"
-            :options="sourceByCategory"
-            :series="sourceByCategorySeries"
-            class="bg-white dark:bg-black rounded-lg overflow-hidden"
+            height="160"
+            :options="bmihist"
+            :series="bmihistfatSeries"
+            class="w-full absolute bottom-0 overflow-hidden"
           >
             <!-- loader -->
             <div
-              class="min-h-[460px] grid place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08]"
+              class="min-h-[160px] grid place-content-center bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08]"
             >
               <span
                 class="animate-spin border-2 border-black dark:border-white !border-l-transparent rounded-full w-5 h-5 inline-flex"
@@ -172,8 +259,7 @@
           </apexchart>
         </div>
       </div>
-      <!-- 身體數值趨勢 -->
-      <div class="panel h-full p-0">
+      <div class="panel h-full p-0 sm:col-span-2 xl:col-span-1">
         <div class="flex p-5">
           <div
             class="shrink-0 bg-primary/10 text-primary rounded-xl w-11 h-11 flex justify-center items-center dark:bg-primary dark:text-white-light"
@@ -203,8 +289,7 @@
           </apexchart>
         </div>
       </div>
-
-      <div class="panel h-full p-0">
+      <div class="panel h-full p-0 sm:col-span-2 xl:col-span-1">
         <div class="flex p-5">
           <div
             class="shrink-0 bg-danger/10 text-danger rounded-xl w-11 h-11 flex justify-center items-center dark:bg-danger dark:text-white-light"
@@ -235,6 +320,15 @@
         </div>
       </div>
     </div>
+
+    <!-- 最新inbody -->
+    <!-- <div class="panel">
+      <div class="flex items-center justify-between mb-5">
+        <h5 class="font-semibold text-lg dark:text-white-light">
+          最新InBody資料
+        </h5>
+      </div>
+    </div> -->
   </div>
 </template>
 
@@ -242,6 +336,13 @@
 import { useAppStore } from "@/stores/index";
 import { useMeta } from "@/composables/use-meta";
 import { Ref, ref, computed, onMounted, watch } from "vue";
+import {
+  TransitionRoot,
+  TransitionChild,
+  Dialog,
+  DialogPanel,
+  DialogOverlay,
+} from "@headlessui/vue";
 import axios from "axios";
 
 import IconCoffee from "@/components/icon/icon-coffee.vue";
@@ -249,6 +350,7 @@ import IconCalendar from "@/components/icon/icon-calendar.vue";
 import IconMapPin from "@/components/icon/icon-map-pin.vue";
 import IconMail from "@/components/icon/icon-mail.vue";
 import IconPhone from "@/components/icon/icon-phone.vue";
+import IconX from "@/components/icon/icon-x.vue";
 
 import Vue3Datatable from "@bhplugin/vue3-datatable";
 import apexchart from "vue3-apexcharts";
@@ -259,12 +361,13 @@ const phoneNumber = ref("0900787962"); // Set default phone number
 const userProfile = ref([] as Array<Record<string, any>>);
 const userHistory = ref([] as Array<Record<string, any>>);
 const userInbody = ref([] as Array<Record<string, any>>);
+const modalContent = ref(null as Record<string, any> | null);
 const error = ref<string | null>(null);
 
 const fetchUserProfile = async () => {
   try {
     const profileResponse = await axios.get(
-      `https://api.l-kk.tw//userprofile?phone=${phoneNumber.value}`
+      `https://api.l-kk.tw/userprofile?phone=${phoneNumber.value}`
     );
     userProfile.value = profileResponse.data;
 
@@ -303,6 +406,19 @@ const fetchUserProfile = async () => {
   }
 };
 
+const fetchModalData = async (sid: string) => {
+  try {
+    const response = await axios.get(
+      `https://api.l-kk.tw/userdatadetail?sid=${sid}`
+    );
+    modalContent.value = response.data;
+    modal_data.value = true;
+  } catch (error) {
+    console.error("Error fetching modal data:", error);
+    modalContent.value = null;
+  }
+};
+
 const skeletalMuscleMassSeries: Ref<{ data: number[] }[]> = ref([
   {
     data: [],
@@ -315,14 +431,21 @@ const percentbodyfatSeries: Ref<{ data: number[] }[]> = ref([
   },
 ]);
 
+const bmihistfatSeries: Ref<{ data: number[] }[]> = ref([
+  {
+    data: [],
+  },
+]);
+
 const updateCharts = () => {
-  if (userInbody.value.length === 0) {
+  if (userInbody.value.length === 0 && userHistory.value.length === 0) {
     clearCharts();
     return;
   }
 
   const smmData: number[] = [];
   const pbfData: number[] = [];
+  const bmiData: number[] = [];
 
   userInbody.value.forEach((entry) => {
     if (entry["SMM (Skeletal Muscle Mass)"]) {
@@ -332,6 +455,17 @@ const updateCharts = () => {
       pbfData.push(parseFloat(entry["PBF (Percent Body Fat)"] as string));
     }
   });
+
+  userHistory.value.forEach((entry) => {
+    if (entry.height && entry.weight) {
+      const heightInMeters = entry.height / 100;
+      const bmi = (entry.weight / (heightInMeters * heightInMeters)).toFixed(2);
+      bmiData.push(parseFloat(bmi));
+    }
+  });
+
+  // 將 bmiData 倒序排列
+  bmiData.reverse();
 
   skeletalMuscleMassSeries.value = [
     {
@@ -344,6 +478,12 @@ const updateCharts = () => {
       data: pbfData,
     },
   ];
+
+  bmihistfatSeries.value = [
+    {
+      data: bmiData,
+    },
+  ];
 };
 
 const clearCharts = () => {
@@ -353,6 +493,11 @@ const clearCharts = () => {
     },
   ];
   percentbodyfatSeries.value = [
+    {
+      data: [],
+    },
+  ];
+  bmihistfatSeries.value = [
     {
       data: [],
     },
@@ -413,121 +558,10 @@ const sortedRows = computed(() =>
       bmi: bmi ? parseFloat(bmi) : "", // 如果bmi存在，将字符串转换回数字，否则返回空字符串
       input_dt: formatDate(entry.input_dt),
       source: entry.source,
+      sid: entry.s_id, // 假设每个entry都有一个sid字段
     };
   })
 );
-
-// 计算 source 数量分布
-const sourceByCategorySeries = ref([0, 0, 0]);
-
-watch(
-  sortedRows,
-  (newRows) => {
-    const sourceCount = { 問卷資料: 0, InBody: 0, BodyGo: 0 };
-
-    newRows.forEach((row) => {
-      if (row.source === "quest_baseline" || row.source === "quest_biweekly") {
-        sourceCount["問卷資料"] += 1;
-      } else if (row.source === "inbody") {
-        sourceCount["InBody"] += 1;
-      } else if (row.source === "bodygo_sppb" || row.source === "bodygo_full") {
-        sourceCount["BodyGo"] += 1;
-      }
-    });
-
-    sourceByCategorySeries.value = [
-      sourceCount["問卷資料"],
-      sourceCount["InBody"],
-      sourceCount["BodyGo"],
-    ];
-  },
-  { immediate: true }
-);
-
-const sourceByCategory = computed(() => {
-  const isDark = store.theme === "dark" || store.isDarkMode ? true : false;
-  return {
-    chart: {
-      type: "donut",
-      height: 460,
-      fontFamily: "Nunito, sans-serif",
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      show: true,
-      width: 25,
-      colors: isDark ? "#0e1726" : "#fff",
-    },
-    colors: isDark
-      ? ["#5c1ac3", "#e2a03f", "#e7515a", "#e2a03f"]
-      : ["#00ab55", "#2196f3", "#e2a03f"],
-    legend: {
-      position: "bottom",
-      horizontalAlign: "center",
-      fontSize: "14px",
-      markers: {
-        width: 10,
-        height: 10,
-        offsetX: -2,
-      },
-      height: 50,
-      offsetY: 20,
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: "65%",
-          background: "transparent",
-          labels: {
-            show: true,
-            name: {
-              show: true,
-              fontSize: "29px",
-              offsetY: -10,
-            },
-            value: {
-              show: true,
-              fontSize: "26px",
-              color: isDark ? "#bfc9d4" : undefined,
-              offsetY: 16,
-              formatter: (val: any) => {
-                return val;
-              },
-            },
-            total: {
-              show: true,
-              label: "Total",
-              color: "#888ea8",
-              fontSize: "29px",
-              formatter: (w: any) => {
-                return w.globals.seriesTotals.reduce(function (a: any, b: any) {
-                  return a + b;
-                }, 0);
-              },
-            },
-          },
-        },
-      },
-    },
-    labels: ["問卷資料", "InBody", "BodyGo"],
-    states: {
-      hover: {
-        filter: {
-          type: "none",
-          value: 0.15,
-        },
-      },
-      active: {
-        filter: {
-          type: "none",
-          value: 0.15,
-        },
-      },
-    },
-  };
-});
 
 const skeletalMuscleMass = computed(() => {
   return {
@@ -606,4 +640,46 @@ const percentbodyfat = computed(() => {
     },
   };
 });
+
+// bmihist
+const bmihist = computed(() => {
+  return {
+    chart: {
+      height: 160,
+      type: "area",
+      fontFamily: "Nunito, sans-serif",
+      sparkline: {
+        enabled: true,
+      },
+    },
+    stroke: {
+      curve: "smooth",
+      width: 2,
+    },
+    colors: ["#00ab55"],
+    grid: {
+      padding: {
+        top: 5,
+      },
+    },
+    yaxis: {
+      show: false,
+    },
+    tooltip: {
+      x: {
+        show: false,
+      },
+      y: {
+        title: {
+          formatter: (val: any) => {
+            return "";
+          },
+        },
+      },
+    },
+  };
+});
+
+const modal_data = ref(false);
+
 </script>

@@ -39,7 +39,7 @@
                                     </div>
                                     </router-link>
                                 </li>
-                                <li class="nav-item">
+                                <!-- <li class="nav-item">
                                     <router-link to="inbody" class="group" @click="toggleMobileMenu">
                                     <div class="flex items-center">
                                         <i class="fa-solid fa-eye group-hover:!text-primary shrink-0 w-5 text-center"></i>
@@ -54,13 +54,13 @@
                                         <span class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">BodyGo</span>
                                     </div>
                                     </router-link>
-                                </li>
+                                </li> -->
                                 </ul>
                         </li>
 
                         <h2 class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                             <icon-minus class="w-4 h-5 flex-none hidden" />
-                            <span>會員專區</span>
+                            <span>使用者專區</span>
                         </h2>
 
                         <li class="nav-item">
