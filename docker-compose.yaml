@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: lkk2024view
+    container_name: lkkhub
     ports:
       - "8888:8888"
     restart: always
